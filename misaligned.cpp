@@ -44,37 +44,8 @@ int print_color_map(const std::function<void(const std::string&)>& output_func =
     return static_cast<int>(color_map.size());
 }
 
-// Test function designed to fail
-void test_print_color_map_fail() {
-    // Intentionally incorrect expected output to fail the test
-    std::vector<std::string> expected_lines = {
-        "1 | White  | Blue",  // Should be "0 | White  | Blue"
-        "2 | White  | Orange",
-        "3 | White  | Green",
-        "4 | White  | Brown",
-        "5 | White  | Slate",
-        "6 | Red    | Blue",
-        "7 | Red    | Orange",
-        "8 | Red    | Green",
-        "9 | Red    | Brown",
-        "10 | Red    | Slate",
-        "11 | Black  | Blue",
-        "12 | Black  | Orange",
-        "13 | Black  | Green",
-        "14 | Black  | Brown",
-        "15 | Black  | Slate",
-        "16 | Yellow | Blue",
-        "17 | Yellow | Orange",
-        "18 | Yellow | Green",
-        "19 | Yellow | Brown",
-        "20 | Yellow | Slate",
-        "21 | Violet | Blue",
-        "22 | Violet | Orange",
-        "23 | Violet | Green",
-        "24 | Violet | Brown",
-        "25 | Violet | Slate"
-    };
-
+// Test function
+void testPrintColorMap() {
     // Mock print function to record calls
     std::vector<std::string> calls;
     auto mock_print = [&calls](const std::string& line) {
@@ -84,14 +55,15 @@ void test_print_color_map_fail() {
     int count = print_color_map(mock_print);
 
     // assertions
-    assert(static_cast<int>(calls.size()) == 25); // value based testing
+    assert(count == 25); // value based testing
+    assert(calls.size() == 25);
     assert(calls[0] == "0 | White  | Blue");      // interaction or Behavior Testing
     assert(calls.back() == "24 | Violet | Slate");
-    // The following will fail because expected_lines[0] != calls[0]
-    assert(calls[0] == expected_lines[0]);
+    // Intentionally failing assertion to expose a bug (for TDD exercise)
+    assert(calls[0] == "1 | White  | Blue"); // This will fail
 }
 
 int main() {
-    test_print_color_map_fail();
+    testPrintColorMap();
     return 0;
 }
