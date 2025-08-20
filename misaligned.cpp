@@ -1,69 +1,37 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <functional>
-#include <cassert>
+#include <assert.h>
 
-// Generate the color map as a vector of tuples
-std::vector<std::tuple<int, std::string, std::string>> generate_color_map() {
-    std::vector<std::string> major_colors = {"White", "Red", "Black", "Yellow", "Violet"};
-    std::vector<std::string> minor_colors = {"Blue", "Orange", "Green", "Brown", "Slate"};
-    std::vector<std::tuple<int, std::string, std::string>> color_map;
+std::string formatColorMapEntry(int pair, const char* major, const char* minor) {
+    char buf[64];
+    snprintf(buf, sizeof(buf), "%2d | %-6s | %s", pair, major, minor);
+    return std::string(buf);
+}
 
-    for (size_t i = 0; i < major_colors.size(); ++i) {
-        for (size_t j = 0; j < minor_colors.size(); ++j) {
-            int pair_number = static_cast<int>(i * minor_colors.size() + j);
-            color_map.emplace_back(pair_number, major_colors[i], minor_colors[j]);
+std::vector<std::string> getColorMapLines() {
+    const char* majorColor[] = {"White", "Red", "Black", "Yellow", "Violet"};
+    const char* minorColor[] = {"Blue", "Orange", "Green", "Brown", "Slate"};
+    std::vector<std::string> lines;
+    for(int i = 0; i < 5; i++) {
+        for(int j = 0; j < 5; j++) {
+            lines.push_back(formatColorMapEntry(i * 5 + j, majorColor[i], minorColor[j]));
         }
     }
-    return color_map;
+    return lines;
 }
 
-// Format a color map entry as a string
-std::string format_color_map_entry(int pair_number, const std::string& major, const std::string& minor) {
-    char buffer[50];
-    snprintf(buffer, sizeof(buffer), "%d | %-6s | %s", pair_number, major.c_str(), minor.c_str());
-    return std::string(buffer);
-}
-
-// Print function abstraction
-void printOnConsole(const std::string& lineItem) {
-    std::cout << lineItem << std::endl;
-}
-
-// Print color map using an output function
-int print_color_map(const std::function<void(const std::string&)>& output_func = printOnConsole) {
-    auto color_map = generate_color_map();
-    for (const auto& entry : color_map) {
-        int pair_number;
-        std::string major, minor;
-        std::tie(pair_number, major, minor) = entry;
-        std::string line = format_color_map_entry(pair_number, major, minor);
-        output_func(line);
-    }
-    return static_cast<int>(color_map.size());
-}
-
-// Test function
 void testPrintColorMap() {
-    // Mock print function to record calls
-    std::vector<std::string> calls;
-    auto mock_print = [&calls](const std::string& line) {
-        calls.push_back(line);
-    };
-
-    int count = print_color_map(mock_print);
-
-    // assertions
-    assert(count == 25); // value based testing
-    assert(calls.size() == 25);
-    assert(calls[0] == "0 | White  | Blue");      // interaction or Behavior Testing
-    assert(calls.back() == "24 | Violet | Slate");
-    // Intentionally failing assertion to expose a bug (for TDD exercise)
-    assert(calls[0] == "1 | White  | Blue"); // This will fail
-}
-
-int main() {
-    testPrintColorMap();
-    return 0;
+    std::cout << "\nPrint color map test\n"; 
+    auto lines = getColorMapLines();
+    assert(lines.size() == 25);
+    // Strengthen: check alignment and content
+    assert(lines[0] == " 0 | White  | Blue"); // Should fail due to original misalignment
+    assert(lines[24] == "24 | Violet | Slate");
+    // Check separator alignment
+    size_t sep = lines[0].find('|');
+    for(const auto& line : lines) {
+        assert(line.find('|') == sep); // Should fail if not aligned
+    }
+    std::cout << "All is well (maybe!)\n";
 }
